@@ -10,8 +10,10 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useAuth } from '@/context/AuthContext'
 
 export function AuthPage() {
+    const { login } = useAuth()
 	const [isLoginView, setIsLoginView] = useState(true)
 
 	// Состояния для хранения значений полей ввода
@@ -40,11 +42,10 @@ export function AuthPage() {
 			console.log('Успешный ответ от сервера:', response.data)
 
 			if (response.data.token) {
-				// TODO: Сохранить токен (например, в localStorage) и перенаправить пользователя
-				alert('Успешный вход! Токен в консоли.')
+				login(response.data.token)
 			} else {
 				alert('Успешная регистрация! Теперь вы можете войти.')
-				setIsLoginView(true) // Переключаем на форму входа после регистрации
+				setIsLoginView(true)
 			}
 		} catch (err: any) {
 			console.error('Ошибка при запросе:', err)
