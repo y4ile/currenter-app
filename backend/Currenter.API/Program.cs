@@ -7,6 +7,19 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
+var policyName = "AllowFrontendApp";
+
+// Добавляем сервис CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(policyName, policy =>
+    {
+        policy.WithOrigins("http://localhost:5173") // <-- ВАЖНО: Укажите здесь адрес вашего frontend-приложения
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 
 // Регистрируем DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -83,6 +96,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(policyName);
 
 app.UseAuthentication();
 app.UseAuthorization();
