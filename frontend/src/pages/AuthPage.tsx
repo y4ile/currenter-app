@@ -11,6 +11,8 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/context/AuthContext'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { AlertTriangle } from 'lucide-react'
 
 export function AuthPage() {
     const { login } = useAuth()
@@ -76,7 +78,7 @@ export function AuthPage() {
 								<Label htmlFor='name'>Name</Label>
 								<Input
 									id='name'
-									placeholder='John Doe'
+									placeholder='Ma Boy'
 									required
 									value={name}
 									onChange={e => setName(e.target.value)} // Обновляем состояние
@@ -88,7 +90,7 @@ export function AuthPage() {
 							<Input
 								id='email'
 								type='email'
-								placeholder='m@example.com'
+								placeholder='test@example.com'
 								required
 								value={email}
 								onChange={e => setEmail(e.target.value)} // Обновляем состояние
@@ -105,7 +107,13 @@ export function AuthPage() {
 							/>
 						</div>
 						{/* Отображаем ошибку, если она есть */}
-						{error && <p className='text-sm text-red-500'>{error}</p>}
+						{error && (
+							<Alert variant='destructive'>
+								<AlertTriangle className='h-4 w-4' />
+								<AlertTitle>Authentication Failed</AlertTitle>
+								<AlertDescription>{error}</AlertDescription>
+							</Alert>
+						)}
 						<Button type='submit' className='w-full'>
 							{isLoginView ? 'Login' : 'Create account'}
 						</Button>
