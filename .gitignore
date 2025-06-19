@@ -1,0 +1,105 @@
+# ===================================================================
+# General & OS-specific
+# ===================================================================
+
+# Operating System generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ===================================================================
+# IDE and Editor specific
+# ===================================================================
+
+# JetBrains Rider
+.idea/
+*.sln.DotSettings.user
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+
+# ===================================================================
+# .NET Core / ASP.NET Core
+# ===================================================================
+
+# Build results
+**/[Bb]in/
+**/[Oo]bj/
+
+# Roslyn analyzers
+*.ruleset
+
+# Log files
+*.log
+
+# Test results
+TestResult/
+*.trx
+
+# User-specific files
+*.userprefs
+*.dbmdl
+*.jfm
+
+# EF Core
+# The migrations folder itself should NOT be ignored, but sometimes temp files appear
+# User Secrets file (already outside the project, but good to be explicit)
+secrets.json
+
+# ===================================================================
+# Node.js / React
+# ===================================================================
+
+# Dependencies
+/node_modules
+/frontend/node_modules
+
+# Build output
+/build
+/dist
+/frontend/build
+/frontend/dist
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Other
+.pnp
+.pnp.js
+.yarn/
+
+# ===================================================================
+# Secrets - CRITICAL
+# ===================================================================
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ===================================================================
+# Docker
+# ===================================================================
+
+# Ignoring local docker context files
+.dockerignore
+# NOTE: Your Dockerfile and docker-compose.yml should NOT be ignored.
