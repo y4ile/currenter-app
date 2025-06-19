@@ -35,7 +35,10 @@ builder.Services.AddAuthentication(options =>
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddHttpClient();
+
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddSingleton<CurrencyUpdateService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
