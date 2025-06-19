@@ -1,5 +1,6 @@
 using Currenter.Api.Data;
 using Currenter.Api.Services;
+using Currenter.Api.BackgroundServices;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -39,6 +40,7 @@ builder.Services.AddHttpClient();
 
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddSingleton<CurrencyUpdateService>();
+builder.Services.AddHostedService<CurrencyRatesUpdater>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
