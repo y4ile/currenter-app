@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import axios from 'axios' // Импортируем axios
+import axiosInstance from '@/api/axiosInstance'
 import { Button } from '@/components/ui/button'
 import {
 	Card,
@@ -36,11 +36,7 @@ export function AuthPage() {
 			: { name, email, password }
 
 		try {
-			const response = await axios.post(
-				`https://localhost:44309${endpoint}`, // URL бэкенда
-				payload
-			)
-
+			const response = await axiosInstance.post(endpoint, payload)
 			console.log('Успешный ответ от сервера:', response.data)
 
 			if (response.data.token) {

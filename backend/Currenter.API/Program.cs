@@ -9,6 +9,14 @@ using Microsoft.IdentityModel.Tokens;
 var builder = WebApplication.CreateBuilder(args);
 var policyName = "AllowFrontendApp";
 
+// Добавляем кэширование в Redis
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    // "redis" - это имя сервиса из нашего docker-compose.yml
+    options.Configuration = "redis:6379"; 
+    options.InstanceName = "Currenter_";
+});
+
 // Добавляем сервис CORS
 builder.Services.AddCors(options =>
 {

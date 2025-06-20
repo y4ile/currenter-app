@@ -6,6 +6,8 @@ using System.Text.Json;
 using Currenter.Api.Data;
 using Currenter.Api.DTOs;
 using Currenter.Api.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace Currenter.Api.Services;
 
@@ -14,12 +16,14 @@ public class CurrencyUpdateService
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IConfiguration _configuration;
     private readonly IServiceProvider _serviceProvider;
+    private readonly IDistributedCache _cache;
 
-    public CurrencyUpdateService(IHttpClientFactory httpClientFactory, IConfiguration configuration, IServiceProvider serviceProvider)
+    public CurrencyUpdateService(IHttpClientFactory httpClientFactory, IConfiguration configuration, IServiceProvider serviceProvider, IDistributedCache cache)
     {
         _httpClientFactory = httpClientFactory;
         _configuration = configuration;
         _serviceProvider = serviceProvider;
+        _cache = cache;
     }
 
     public async Task UpdateCurrencyRatesAsync()
@@ -77,5 +81,13 @@ public class CurrencyUpdateService
 
         await context.SaveChangesAsync();
         Console.WriteLine("Successfully updated currency rates.");
+        
+        const string cacheKey = "all_currencies";
+        var currenciesFromDb = await context.Currencies.AsNoTracking().OrderBy(c => c.CurrencyCode).ToListAsync();
+        var serializedCurrencies = JsonSerializer.Serialize(currenciesFromDb);
+        var cacheOptions = new DistributedCacheEntryOptions()
+            .SetAbsoluteExpiration(TimeSpan.FromMinutes(10));
+        await _cache.SetStringAsync(cacheKey, serializedCurrencies, cacheOptions);
+        Console.WriteLine("Cache has been updated.");
     }
 }

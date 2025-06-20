@@ -1,4 +1,27 @@
 services:
+  # Сервис для бэкенда
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Currenter.Api/Dockerfile
+    ports:
+      - "7001:8080"
+    environment:
+      # Строка подключения теперь указывает на сервис mssql
+      - ConnectionStrings__DefaultConnection=Server=mssql;Database=CurrenterDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True
+      - Jwt__Key=${JWT_KEY} # Передаем JWT ключ
+      - ExternalApis__ExchangeRateApi__ApiKey=${EXCHANGERATE_API_KEY} # Передаем API ключ
+    depends_on:
+      - mssql # Бэкенд запустится только после старта базы данных
+      - redis
+
+  # Сервис для фронтенда
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80" # Маппим порт 80 контейнера на 8080 хоста
   # Сервис для базы данных MSSQL
   mssql:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -10,6 +33,12 @@ services:
       - "1433:1433"
     volumes:
       - mssql-data:/var/opt/mssql
+  # Сервис для кэша Redis
+  redis:
+    image: redis:alpine
+    container_name: currenter-redis
+    ports:
+      - "6379:6379"
 
 volumes:
   mssql-data:
