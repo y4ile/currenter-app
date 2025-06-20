@@ -1,8 +1,6 @@
 <h1 align="center">
   <br>
-  <a href=""><img src="https://raw.githubusercontent.com/y4ile/currenter-app/main/img/crntr.svg" alt="crntr" width="200"></a>
-  <br>
-  Currenter
+  <a href=""><img src="https://raw.githubusercontent.com/y4ile/currenter-app/refs/heads/main/img/crntr.svg?token=GHSAT0AAAAAADFLSTKC7BXXLLBR2DCPC4RC2CVKUWQ" alt="crntr" width="600"></a>
   <br>
 </h1>
 
