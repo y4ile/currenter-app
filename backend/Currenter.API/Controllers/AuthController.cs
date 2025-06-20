@@ -20,11 +20,13 @@ public class AuthController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
     private readonly IJwtService _jwtService;
+    private readonly IConfiguration _configuration;
 
-    public AuthController(ApplicationDbContext context, IJwtService jwtService)
+    public AuthController(ApplicationDbContext context, IJwtService jwtService, IConfiguration configuration)
     {
         _context = context;
         _jwtService = jwtService;
+        _configuration = configuration;
     }
     
     // [POST] /api/auth/register
@@ -45,11 +47,32 @@ public class AuthController : ControllerBase
         {
             Name = registerDto.Name,
             Email = registerDto.Email,
-            PasswordHash = passwordHash
+            PasswordHash = passwordHash,
+            Role = "User"
         };
         
         // Сохранение в БД
         _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+        
+        // Предоставление доступа к валютам
+        // Считываем список валют по умолчанию из appsettings.json
+        var defaultCurrencies = _configuration.GetSection("DefaultCurrencyAccess").Get<List<string>>();
+
+        if (defaultCurrencies != null)
+        {
+            foreach (var currencyCode in defaultCurrencies)
+            {
+                var accessEntry = new UserCurrencyAccess
+                {
+                    UserId = user.Id,
+                    CurrencyCode = currencyCode
+                };
+                _context.UserCurrencyAccesses.Add(accessEntry);
+            }
+        }
+
+        // Сохраняем данные о валютах
         await _context.SaveChangesAsync();
 
         return Ok(new { message = "User registered successfully." });
