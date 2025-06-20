@@ -1,4 +1,10 @@
-# Currenter
+<h1 align="center">
+  <br>
+  <a href=""><img src="https://raw.githubusercontent.com/y4ile/currenter-app/main/img/crntr.svg" alt="crntr" width="200"></a>
+  <br>
+  Currenter
+  <br>
+</h1>
 
 [![forthebadge](https://forthebadge.com/images/badges/docker-container.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/made-with-c-sharp.svg)](https://forthebadge.com)
