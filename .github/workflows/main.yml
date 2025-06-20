@@ -1,0 +1,57 @@
+name: Currenter CI
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  # Первая задача: сборка и проверка бэкенда
+  backend-build:
+    # Запускаем на последней версии Ubuntu
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Клонируем код репозитория
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Устанавливаем .NET 8 SDK
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      # Восстанавливаем зависимости
+      - name: Restore dependencies
+        run: dotnet restore ./backend/Currenter.Api/Currenter.Api.csproj
+
+      # Собираем проект
+      - name: Build backend
+        run: dotnet build ./backend/Currenter.Api/Currenter.Api.csproj --no-restore
+
+  # Вторая задача: сборка и проверка фронтенда
+  frontend-build:
+    # Запускаем на последней версии Ubuntu
+    runs-on: ubuntu-latest
+
+    steps:
+      # Клонируем код репозитория
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Устанавливаем Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Устанавливаем npm-зависимости
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./frontend # Указываем рабочую папку
+
+      # Собираем проект
+      - name: Build frontend
+        run: npm run build
+        working-directory: ./frontend # Указываем рабочую папку
