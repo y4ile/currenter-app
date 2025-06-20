@@ -1,9 +1,12 @@
 # Currenter
+
 [![forthebadge](https://forthebadge.com/images/badges/docker-container.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/made-with-c-sharp.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/made-with-react.svg)](https://forthebadge.com)
 
 **Currenter** — это полнофункциональное веб-приложение для конвертации валют. Оно предоставляет актуальные курсы валют, требует авторизации пользователей для доступа к функционалу и позволяет выполнять конвертацию между различными валютами.
+
+[![Currenter CI](https://github.com/y4ile/currenter-app/actions/workflows/main.yml/badge.svg)](https://github.com/y4ile/currenter-app/actions/workflows/main.yml)
 
 ## 🚀 Основные возможности
 
