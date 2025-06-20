@@ -7,6 +7,7 @@ services:
     ports:
       - "7001:8080"
     environment:
+      #- ASPNETCORE_ENVIRONMENT=Development # Для запуска с Dev параметрами
       # Строка подключения теперь указывает на сервис mssql
       - ConnectionStrings__DefaultConnection=Server=mssql;Database=CurrenterDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True
       - Jwt__Key=${JWT_KEY} # Передаем JWT ключ
