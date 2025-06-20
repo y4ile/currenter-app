@@ -22,4 +22,23 @@ axiosInstance.interceptors.request.use(
 	}
 )
 
+axiosInstance.interceptors.response.use(
+	// Обработка успешных ответов (просто пробрасываем их дальше)
+	response => {
+		return response
+	},
+	// Обработка ошибок
+	error => {
+		// Если мы получили ошибку 401 Unauthorized
+		if (error.response && error.response.status === 401) {
+			// Очищаем токен из хранилища
+			localStorage.removeItem('token')
+			window.location.href = '/auth'
+			alert('Ваша сессия истекла. Пожалуйста, войдите снова.')
+		}
+		// Для всех других ошибок, просто пробрасываем их дальше
+		return Promise.reject(error)
+	}
+)
+
 export default axiosInstance

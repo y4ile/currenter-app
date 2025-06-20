@@ -1,23 +1,15 @@
 import { useState, useEffect, useMemo } from 'react'
-import { useAuth } from '@/context/AuthContext'
-import { Button } from '@/components/ui/button'
 import {
 	Card,
 	CardContent,
 	CardDescription,
 	CardHeader,
 	CardTitle,
+	CardFooter,
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from '@/components/ui/select'
 import axiosInstance from '@/api/axiosInstance'
-import { CurrencyChart } from '@/components/custom/CurrencyChart' // <-- Импортируем наш новый график
+import { CurrencyComboBox } from '@/components/custom/CurrencyComboBox'
 
 interface Currency {
 	currencyCode: string
@@ -25,13 +17,13 @@ interface Currency {
 }
 
 export function HomePage() {
-	const { logout } = useAuth()
 	const [currencies, setCurrencies] = useState<Currency[]>([])
 	const [fromCurrency, setFromCurrency] = useState<string>('USD')
 	const [toCurrency, setToCurrency] = useState<string>('EUR')
 	const [amount, setAmount] = useState<number>(1)
 	const [result, setResult] = useState<number>(0)
 	const [isLoading, setIsLoading] = useState(true)
+	const [lastUpdated, setLastUpdated] = useState<string | null>(null)
 
 	useEffect(() => {
 		const fetchCurrencies = async () => {
@@ -39,6 +31,15 @@ export function HomePage() {
 				setIsLoading(true)
 				const response = await axiosInstance.get('/api/currencies')
 				setCurrencies(response.data)
+
+				// Проверяем, что данные пришли и массив не пустой
+				if (response.data && response.data.length > 0) {
+					// Берем дату обновления из первой валюты (они все обновляются одновременно)
+					const updateTimestamp = response.data[0].lastUpdated
+					// Форматируем дату в удобный для чтения вид
+					const formattedDate = new Date(updateTimestamp).toLocaleString()
+					setLastUpdated(formattedDate)
+				}
 			} catch (error) {
 				console.error('Failed to fetch currencies', error)
 			} finally {
@@ -58,16 +59,6 @@ export function HomePage() {
 		}
 	}, [amount, fromCurrency, toCurrency, currencies])
 
-	const currencyOptions = useMemo(
-		() =>
-			currencies.map(c => (
-				<SelectItem key={c.currencyCode} value={c.currencyCode}>
-					{c.currencyCode}
-				</SelectItem>
-			)),
-		[currencies]
-	)
-
 	if (isLoading) {
 		return (
 			<div className='flex h-screen w-full items-center justify-center'>
@@ -77,7 +68,7 @@ export function HomePage() {
 	}
 
 	return (
-		<div className='flex h-screen w-full flex-col items-center justify-center bg-background p-4'>
+		<div className='flex h-full w-full flex-col items-center justify-center bg-background p-4'>
 			<div className='grid w-full max-w-xl gap-6'>
 				{/* Карточка №1: Ввод данных */}
 				<Card>
@@ -88,32 +79,32 @@ export function HomePage() {
 						</CardDescription>
 					</CardHeader>
 					<CardContent>
-						<div className='grid grid-cols-1 gap-4 sm:grid-cols-3'>
+						<div className='flex flex-row flex-auto gap-2'>
+							<div className='flex flex-col gap-2'>
+								<p className='text-sm text-muted-foreground'>From</p>
+								<CurrencyComboBox
+									currencies={currencies}
+									value={fromCurrency}
+									onValueChange={setFromCurrency}
+									placeholder='From'
+								/>
+							</div>
 							<div className='flex flex-col gap-2'>
 								<p className='text-sm text-muted-foreground'>Amount</p>
 								<Input
 									type='number'
-									value={amount}
+									value={amount.toString()}
 									onChange={e => setAmount(Number(e.target.value))}
 								/>
 							</div>
 							<div className='flex flex-col gap-2'>
-								<p className='text-sm text-muted-foreground'>From</p>
-								<Select value={fromCurrency} onValueChange={setFromCurrency}>
-									<SelectTrigger>
-										<SelectValue />
-									</SelectTrigger>
-									<SelectContent>{currencyOptions}</SelectContent>
-								</Select>
-							</div>
-							<div className='flex flex-col gap-2'>
 								<p className='text-sm text-muted-foreground'>To</p>
-								<Select value={toCurrency} onValueChange={setToCurrency}>
-									<SelectTrigger>
-										<SelectValue />
-									</SelectTrigger>
-									<SelectContent>{currencyOptions}</SelectContent>
-								</Select>
+								<CurrencyComboBox
+									currencies={currencies}
+									value={toCurrency}
+									onValueChange={setToCurrency}
+									placeholder='To'
+								/>
 							</div>
 						</div>
 					</CardContent>
@@ -122,7 +113,7 @@ export function HomePage() {
 				{/* Карточка №2: Результат и график */}
 				<Card>
 					<CardHeader>
-						<CardDescription>Result</CardDescription>
+						<CardDescription>Converted</CardDescription>
 						<CardTitle className='text-4xl'>
 							{result.toFixed(4)} {toCurrency}
 						</CardTitle>
@@ -130,19 +121,18 @@ export function HomePage() {
 							+0.0% from yesterday (placeholder)
 						</CardDescription>
 					</CardHeader>
-					<CardContent>
-						<CurrencyChart />
-					</CardContent>
+					{lastUpdated && (
+						<CardFooter>
+							<a
+								href='https://app.exchangerate-api.com/'
+								className='text-xs text-muted-foreground'
+							>
+								Last updated: {lastUpdated}
+							</a>
+						</CardFooter>
+					)}
 				</Card>
 			</div>
-
-			<Button
-				onClick={logout}
-				variant='outline'
-				className='absolute top-4 right-4'
-			>
-				Logout
-			</Button>
 		</div>
 	)
 }

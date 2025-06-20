@@ -13,6 +13,15 @@ import { Label } from '@/components/ui/label'
 import { useAuth } from '@/context/AuthContext'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { AlertTriangle } from 'lucide-react'
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 
 export function AuthPage() {
     const { login } = useAuth()
@@ -25,6 +34,13 @@ export function AuthPage() {
 
 	// Состояние для отображения ошибок
 	const [error, setError] = useState('')
+
+	// Состояние для блока диалога
+	const [dialogOpen, setDialogOpen] = useState(false)
+	const [dialogContent, setDialogContent] = useState({
+		title: '',
+		description: '',
+	})
 
 	const handleSubmit = async (event: React.FormEvent) => {
 		event.preventDefault() // Предотвращаем стандартную перезагрузку страницы
@@ -42,8 +58,14 @@ export function AuthPage() {
 			if (response.data.token) {
 				login(response.data.token)
 			} else {
-				alert('Успешная регистрация! Теперь вы можете войти.')
+				setDialogContent({
+					title: 'Registration Successful!',
+					description: 'Your account has been created. You can now log in.',
+				})
+				setDialogOpen(true)
 				setIsLoginView(true)
+				//alert('Успешная регистрация! Теперь вы можете войти.')
+				//setIsLoginView(true)
 			}
 		} catch (err: any) {
 			console.error('Ошибка при запросе:', err)
@@ -55,79 +77,96 @@ export function AuthPage() {
 	}
 
 	return (
-		<div className='flex h-screen w-full items-center justify-center bg-background'>
-			<Card className='w-full max-w-sm'>
-				<CardHeader>
-					<CardTitle className='text-2xl'>
-						{isLoginView ? 'Login' : 'Create an account'}
-					</CardTitle>
-					<CardDescription>
-						{isLoginView
-							? 'Enter your email below to login to your account.'
-							: 'Enter your details below to create your account.'}
-					</CardDescription>
-				</CardHeader>
-				<form onSubmit={handleSubmit}>
-					<CardContent className='grid gap-4'>
-						{!isLoginView && (
+		<>
+			<div className='flex h-screen w-full items-center justify-center bg-background'>
+				<Card className='w-full max-w-sm'>
+					<CardHeader>
+						<CardTitle className='text-2xl'>
+							{isLoginView ? 'Login' : 'Create an account'}
+						</CardTitle>
+						<CardDescription>
+							{isLoginView
+								? 'Enter your email below to login to your account.'
+								: 'Enter your details below to create your account.'}
+						</CardDescription>
+					</CardHeader>
+					<form onSubmit={handleSubmit}>
+						<CardContent className='grid gap-4'>
+							{!isLoginView && (
+								<div className='grid gap-2'>
+									<Label htmlFor='name'>Name</Label>
+									<Input
+										id='name'
+										placeholder='Ma Boy'
+										required
+										value={name}
+										onChange={e => setName(e.target.value)} // Обновляем состояние
+									/>
+								</div>
+							)}
 							<div className='grid gap-2'>
-								<Label htmlFor='name'>Name</Label>
+								<Label htmlFor='email'>Email</Label>
 								<Input
-									id='name'
-									placeholder='Ma Boy'
+									id='email'
+									type='email'
+									placeholder='test@example.com'
 									required
-									value={name}
-									onChange={e => setName(e.target.value)} // Обновляем состояние
+									value={email}
+									onChange={e => setEmail(e.target.value)} // Обновляем состояние
 								/>
 							</div>
-						)}
-						<div className='grid gap-2'>
-							<Label htmlFor='email'>Email</Label>
-							<Input
-								id='email'
-								type='email'
-								placeholder='test@example.com'
-								required
-								value={email}
-								onChange={e => setEmail(e.target.value)} // Обновляем состояние
-							/>
-						</div>
-						<div className='grid gap-2'>
-							<Label htmlFor='password'>Password</Label>
-							<Input
-								id='password'
-								type='password'
-								required
-								value={password}
-								onChange={e => setPassword(e.target.value)} // Обновляем состояние
-							/>
-						</div>
-						{/* Отображаем ошибку, если она есть */}
-						{error && (
-							<Alert variant='destructive'>
-								<AlertTriangle className='h-4 w-4' />
-								<AlertTitle>Authentication Failed</AlertTitle>
-								<AlertDescription>{error}</AlertDescription>
-							</Alert>
-						)}
-						<Button type='submit' className='w-full'>
-							{isLoginView ? 'Login' : 'Create account'}
-						</Button>
-					</CardContent>
-				</form>
-				<div className='mb-6 text-center text-sm'>
-					{isLoginView ? "Don't have an account?" : 'Already have an account?'}
-					<button
-						onClick={() => {
-							setIsLoginView(!isLoginView)
-							setError('') // Сбрасываем ошибку при переключении
-						}}
-						className='ml-1 underline'
-					>
-						{isLoginView ? 'Sign up' : 'Login'}
-					</button>
-				</div>
-			</Card>
-		</div>
+							<div className='grid gap-2'>
+								<Label htmlFor='password'>Password</Label>
+								<Input
+									id='password'
+									type='password'
+									required
+									value={password}
+									onChange={e => setPassword(e.target.value)} // Обновляем состояние
+								/>
+							</div>
+							{/* Отображаем ошибку, если она есть */}
+							{error && (
+								<Alert variant='destructive'>
+									<AlertTriangle className='h-4 w-4' />
+									<AlertTitle>Authentication Failed</AlertTitle>
+									<AlertDescription>{error}</AlertDescription>
+								</Alert>
+							)}
+							<Button type='submit' className='w-full'>
+								{isLoginView ? 'Login' : 'Create account'}
+							</Button>
+						</CardContent>
+					</form>
+					<div className='mb-6 text-center text-sm'>
+						{isLoginView
+							? "Don't have an account?"
+							: 'Already have an account?'}
+						<button
+							onClick={() => {
+								setIsLoginView(!isLoginView)
+								setError('') // Сбрасываем ошибку при переключении
+							}}
+							className='ml-1 underline'
+						>
+							{isLoginView ? 'Sign up' : 'Login'}
+						</button>
+					</div>
+				</Card>
+			</div>
+			<AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>{dialogContent.title}</AlertDialogTitle>
+						<AlertDialogDescription>
+							{dialogContent.description}
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogAction>Continue</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
+		</>
 	)
 }

@@ -3,10 +3,23 @@ import {
 	Routes,
 	Route,
 	Navigate,
+	Outlet,
 } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { AuthPage } from './pages/AuthPage'
 import { HomePage } from './pages/HomePage'
+import { Header } from './components/custom/Header'
+
+function ProtectedLayout() {
+	return (
+		<div>
+			<Header />
+			<main>
+				<Outlet />
+			</main>
+		</div>
+	)
+}
 
 function AppRoutes() {
 	const { token } = useAuth()
@@ -17,10 +30,11 @@ function AppRoutes() {
 				path='/auth'
 				element={!token ? <AuthPage /> : <Navigate to='/' />}
 			/>
-			<Route
-				path='/'
-				element={token ? <HomePage /> : <Navigate to='/auth' />}
-			/>
+
+			<Route element={token ? <ProtectedLayout /> : <Navigate to='/auth' />}>
+				<Route path='/' element={<HomePage />} />
+			</Route>
+
 			<Route path='*' element={<Navigate to='/' />} />
 		</Routes>
 	)
