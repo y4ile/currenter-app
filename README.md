@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <a href=""><img src="https://raw.githubusercontent.com/y4ile/currenter-app/refs/heads/main/img/crntr.svg?token=GHSAT0AAAAAADFLSTKC7BXXLLBR2DCPC4RC2CVKUWQ" alt="crntr" width="600"></a>
+  <a href=""><img src="https://i.imgur.com/i0MM4x7.png" alt="crntr" width="600"></a>
   <br>
 </h1>
 
