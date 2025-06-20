@@ -24,20 +24,29 @@ axiosInstance.interceptors.request.use(
 )
 
 axiosInstance.interceptors.response.use(
-	// Обработка успешных ответов (просто пробрасываем их дальше)
-	response => {
-		return response
-	},
-	// Обработка ошибок
+	// Успешный ответ просто пробрасываем дальше
+	response => response,
+
+	// Обрабатываем ошибки
 	error => {
-		// Если мы получили ошибку 401 Unauthorized
-		if (error.response && error.response.status === 401) {
-			// Очищаем токен из хранилища
+		const originalRequest = error.config
+
+		// Безопасно получаем URL, чтобы избежать ошибок, если он пустой
+		const url = originalRequest.url || ''
+
+		// Проверяем, что это ошибка 401 и что URL НЕ ВКЛЮЧАЕТ пути для входа/регистрации
+		if (
+			error.response?.status === 401 &&
+			!url.includes('/auth/login') &&
+			!url.includes('/auth/register')
+		) {
+			// Это ошибка на защищенном роуте, значит, токен истек
 			localStorage.removeItem('token')
 			window.location.href = '/auth'
-			toast.error('Your session expired')
+			toast.error('Ваша сессия истекла')
 		}
-		// Для всех других ошибок, просто пробрасываем их дальше
+
+		// Для всех других ошибок (включая 401 при логине) просто пробрасываем их дальше
 		return Promise.reject(error)
 	}
 )

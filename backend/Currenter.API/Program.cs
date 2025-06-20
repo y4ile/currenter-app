@@ -4,6 +4,7 @@ using Currenter.Api.BackgroundServices;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Data.SqlClient;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -96,36 +97,47 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+// Инициализация приложения
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
     try
     {
         var context = services.GetRequiredService<ApplicationDbContext>();
-        var configuration = services.GetRequiredService<IConfiguration>();
 
+        // Применение миграций
+        logger.LogInformation("Applying database migrations...");
+        try
+        {
+            // Пытаемся применить миграции
+            await context.Database.MigrateAsync();
+        }
+        catch (SqlException ex) when (ex.Number == 1801)
+        {
+            // Если БД уже существует
+            logger.LogWarning("Database already exists. Skipping creation and proceeding with startup.");
+        }
+        logger.LogInformation("Database is ready.");
+
+        // Синхронизация администраторов
+        var configuration = services.GetRequiredService<IConfiguration>();
         var adminEmails = configuration.GetSection("AdminUsers").Get<List<string>>() ?? new List<string>();
 
         foreach (var email in adminEmails)
         {
             var user = await context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
-            // Если пользователь с таким email найден и он еще не админ
             if (user != null && user.Role != "Admin")
             {
                 user.Role = "Admin";
-                Console.WriteLine($"User {user.Email} has been promoted to Admin.");
+                logger.LogInformation("User {Email} has been promoted to Admin.", user.Email);
             }
-            else if (user == null)
-                Console.WriteLine($"User {email} not found.");
         }
-        // Сохраняем все изменения в базе данных
         await context.SaveChangesAsync();
     }
     catch (Exception ex)
     {
-        // Логируем ошибку, если что-то пошло не так
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while promoting admin users.");
+        logger.LogError(ex, "An error occurred during database initialization.");
     }
 }
 

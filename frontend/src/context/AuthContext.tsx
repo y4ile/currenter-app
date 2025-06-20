@@ -33,9 +33,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	useEffect(() => {
 		if (token) {
 			try {
-				const decodedUser: User = jwtDecode(token) // <-- Декодируем токен
-				console.log('Decoded Token Payload:', decodedUser)
-				setUser(decodedUser) // <-- Сохраняем пользователя в состояние
+				const decodedUser: User = jwtDecode(token) // Декодируем токен
+				setUser(decodedUser) // Сохраняем пользователя в состояние
 				setRole(decodedUser.role)
 				localStorage.setItem('token', token)
 			} catch (error) {
