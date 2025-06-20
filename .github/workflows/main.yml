@@ -24,11 +24,11 @@ jobs:
 
       # Восстанавливаем зависимости
       - name: Restore dependencies
-        run: dotnet restore ./backend/Currenter.Api/Currenter.Api.csproj
+        run: dotnet restore ./backend/Currenter.sln
 
-      # Собираем проект
+      # Собираем все проекты в решении
       - name: Build backend
-        run: dotnet build ./backend/Currenter.Api/Currenter.Api.csproj --no-restore
+        run: dotnet build ./backend/Currenter.sln --no-restore
 
   # Вторая задача: сборка и проверка фронтенда
   frontend-build:
