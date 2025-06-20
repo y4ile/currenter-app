@@ -13,15 +13,7 @@ import { Label } from '@/components/ui/label'
 import { useAuth } from '@/context/AuthContext'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { AlertTriangle } from 'lucide-react'
-import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+import { toast } from 'sonner'
 
 export function AuthPage() {
     const { login } = useAuth()
@@ -35,13 +27,6 @@ export function AuthPage() {
 	// Состояние для отображения ошибок
 	const [error, setError] = useState('')
 
-	// Состояние для блока диалога
-	const [dialogOpen, setDialogOpen] = useState(false)
-	const [dialogContent, setDialogContent] = useState({
-		title: '',
-		description: '',
-	})
-
 	const handleSubmit = async (event: React.FormEvent) => {
 		event.preventDefault() // Предотвращаем стандартную перезагрузку страницы
 		setError('') // Сбрасываем предыдущие ошибки
@@ -53,25 +38,21 @@ export function AuthPage() {
 
 		try {
 			const response = await axiosInstance.post(endpoint, payload)
-			console.log('Успешный ответ от сервера:', response.data)
+			console.log('Server response:', response.data)
 
 			if (response.data.token) {
 				login(response.data.token)
 			} else {
-				setDialogContent({
-					title: 'Registration Successful!',
-					description: 'Your account has been created. You can now log in.',
-				})
-				setDialogOpen(true)
+				toast.success('Registration completed successfully!')
 				setIsLoginView(true)
 				//alert('Успешная регистрация! Теперь вы можете войти.')
 				//setIsLoginView(true)
 			}
 		} catch (err: any) {
-			console.error('Ошибка при запросе:', err)
+			console.error('Response error:', err)
 			// Устанавливаем сообщение об ошибке, которое пришло с бэкенда
 			const errorMessage =
-				err.response?.data?.message || err.response?.data || 'Произошла ошибка.'
+				err.response?.data?.message || err.response?.data || 'Error ocurred'
 			setError(errorMessage)
 		}
 	}
@@ -154,19 +135,6 @@ export function AuthPage() {
 					</div>
 				</Card>
 			</div>
-			<AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
-				<AlertDialogContent>
-					<AlertDialogHeader>
-						<AlertDialogTitle>{dialogContent.title}</AlertDialogTitle>
-						<AlertDialogDescription>
-							{dialogContent.description}
-						</AlertDialogDescription>
-					</AlertDialogHeader>
-					<AlertDialogFooter>
-						<AlertDialogAction>Continue</AlertDialogAction>
-					</AlertDialogFooter>
-				</AlertDialogContent>
-			</AlertDialog>
 		</>
 	)
 }

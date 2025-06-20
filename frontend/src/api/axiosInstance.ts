@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { toast } from 'sonner'
 
 const axiosInstance = axios.create({
 	// baseURL здесь не указываем, так как он разный для Docker и локальной разработки
@@ -34,7 +35,7 @@ axiosInstance.interceptors.response.use(
 			// Очищаем токен из хранилища
 			localStorage.removeItem('token')
 			window.location.href = '/auth'
-			alert('Ваша сессия истекла. Пожалуйста, войдите снова.')
+			toast.error('Your session expired')
 		}
 		// Для всех других ошибок, просто пробрасываем их дальше
 		return Promise.reject(error)

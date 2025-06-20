@@ -9,6 +9,7 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import { AuthPage } from './pages/AuthPage'
 import { HomePage } from './pages/HomePage'
 import { Header } from './components/custom/Header'
+import { Toaster } from '@/components/ui/sonner'
 
 function ProtectedLayout() {
 	return (
@@ -45,6 +46,7 @@ function App() {
 		<Router>
 			<AuthProvider>
 				<AppRoutes />
+				<Toaster position='bottom-center' />
 			</AuthProvider>
 		</Router>
 	)
