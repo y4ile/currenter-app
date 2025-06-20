@@ -13,8 +13,10 @@ services:
       - Jwt__Key=${JWT_KEY} # Передаем JWT ключ
       - ExternalApis__ExchangeRateApi__ApiKey=${EXCHANGERATE_API_KEY} # Передаем API ключ
     depends_on:
-      - mssql # Бэкенд запустится только после старта базы данных
-      - redis
+      mssql:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
   # Сервис для фронтенда
   frontend:
@@ -23,6 +25,9 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8080:80" # Маппим порт 80 контейнера на 8080 хоста
+    depends_on:
+      backend:
+        condition: service_started
   # Сервис для базы данных MSSQL
   mssql:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -34,6 +39,12 @@ services:
       - "1433:1433"
     volumes:
       - mssql-data:/var/opt/mssql
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "${MSSQL_SA_PASSWORD}" -C -Q "SELECT 1"
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
   # Сервис для кэша Redis
   redis:
     image: redis:alpine

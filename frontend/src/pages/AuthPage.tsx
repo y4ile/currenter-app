@@ -41,6 +41,10 @@ export function AuthPage() {
 			console.log('Server response:', response.data)
 
 			if (response.data.token) {
+				console.log(
+					'AuthPage: API call successful, token received:',
+					response.data.token
+				)
 				login(response.data.token)
 			} else {
 				toast.success('Registration completed successfully!')

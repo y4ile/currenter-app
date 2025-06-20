@@ -96,6 +96,39 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        var configuration = services.GetRequiredService<IConfiguration>();
+
+        var adminEmails = configuration.GetSection("AdminUsers").Get<List<string>>() ?? new List<string>();
+
+        foreach (var email in adminEmails)
+        {
+            var user = await context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+            // Если пользователь с таким email найден и он еще не админ
+            if (user != null && user.Role != "Admin")
+            {
+                user.Role = "Admin";
+                Console.WriteLine($"User {user.Email} has been promoted to Admin.");
+            }
+            else if (user == null)
+                Console.WriteLine($"User {email} not found.");
+        }
+        // Сохраняем все изменения в базе данных
+        await context.SaveChangesAsync();
+    }
+    catch (Exception ex)
+    {
+        // Логируем ошибку, если что-то пошло не так
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while promoting admin users.");
+    }
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

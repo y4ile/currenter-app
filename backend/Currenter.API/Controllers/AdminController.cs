@@ -91,4 +91,16 @@ public class AdminController : ControllerBase
 
         return Ok("Access revoked successfully.");
     }
+    
+    /// Получает список всех существующих валют
+    [HttpGet("currencies")]
+    public async Task<IActionResult> GetAllCurrencies()
+    {
+        var allCurrencies = await _context.Currencies
+            .AsNoTracking()
+            .OrderBy(c => c.CurrencyCode)
+            .ToListAsync();
+
+        return Ok(allCurrencies);
+    }
 }

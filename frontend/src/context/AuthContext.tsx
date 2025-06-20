@@ -10,11 +10,13 @@ import { jwtDecode } from 'jwt-decode'
 interface User {
 	email: string
 	nameid: string
+	role: string
 }
 
 interface AuthContextType {
 	token: string | null
 	user: User | null
+	role: string | null
 	login: (newToken: string) => void
 	logout: () => void
 }
@@ -26,20 +28,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		localStorage.getItem('token')
 	)
 	const [user, setUser] = useState<User | null>(null)
+	const [role, setRole] = useState<string | null>(null)
 
 	useEffect(() => {
 		if (token) {
 			try {
 				const decodedUser: User = jwtDecode(token) // <-- Декодируем токен
+				console.log('Decoded Token Payload:', decodedUser)
 				setUser(decodedUser) // <-- Сохраняем пользователя в состояние
+				setRole(decodedUser.role)
 				localStorage.setItem('token', token)
 			} catch (error) {
 				console.error('Invalid token:', error)
 				setUser(null)
+				setRole(null)
 				localStorage.removeItem('token')
 			}
 		} else {
 			setUser(null)
+			setRole(null)
 			localStorage.removeItem('token')
 		}
 	}, [token])
@@ -53,7 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	}
 
 	return (
-		<AuthContext.Provider value={{ token, user, login, logout }}>
+		<AuthContext.Provider value={{ token, user, role, login, logout }}>
 			{children}
 		</AuthContext.Provider>
 	)

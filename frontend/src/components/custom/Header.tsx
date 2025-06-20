@@ -10,9 +10,10 @@ import {
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Coins } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 export function Header() {
-	const { user, logout } = useAuth()
+	const { user, logout, role } = useAuth()
 
 	// Получаем инициалы из email, если имя недоступно
 	const getInitials = () => {
@@ -48,6 +49,11 @@ export function Header() {
 								</div>
 							</DropdownMenuLabel>
 							<DropdownMenuSeparator />
+							{role === 'Admin' && (
+								<DropdownMenuItem asChild>
+									<Link to='/admin'>Admin Panel</Link>
+								</DropdownMenuItem>
+							)}
 							<DropdownMenuItem onClick={logout}>Log out</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>

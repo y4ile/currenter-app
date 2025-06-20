@@ -8,6 +8,7 @@ import {
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { AuthPage } from './pages/AuthPage'
 import { HomePage } from './pages/HomePage'
+import { AdminPage } from './pages/AdminPage'
 import { Header } from './components/custom/Header'
 import { Toaster } from '@/components/ui/sonner'
 
@@ -23,7 +24,7 @@ function ProtectedLayout() {
 }
 
 function AppRoutes() {
-	const { token } = useAuth()
+	const { token, role } = useAuth()
 
 	return (
 		<Routes>
@@ -34,6 +35,10 @@ function AppRoutes() {
 
 			<Route element={token ? <ProtectedLayout /> : <Navigate to='/auth' />}>
 				<Route path='/' element={<HomePage />} />
+				<Route
+					path='/admin'
+					element={role === 'Admin' ? <AdminPage /> : <Navigate to='/' />}
+				/>
 			</Route>
 
 			<Route path='*' element={<Navigate to='/' />} />
