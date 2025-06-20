@@ -40,6 +40,9 @@ services:
     container_name: currenter-redis
     ports:
       - "6379:6379"
+    volumes:
+      - redis-data:/data
 
 volumes:
   mssql-data:
+  redis-data:
